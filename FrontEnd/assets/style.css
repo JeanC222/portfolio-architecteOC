@@ -186,3 +186,30 @@ footer nav ul {
 	margin: 2em
 }
 
+/* Filters */
+
+.all-filters {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+	margin: 30px 0 50px 0;
+}
+
+.filter {
+	color: #1D6154;
+	background-color: white;
+	font-size: 16px;
+	border: 1px solid #1D6154;
+	border-radius: 60px;
+	padding: 6px 20px;
+}
+
+.filter:hover {
+    color: rgba(255, 0, 0, 0.329);
+	border: 1px solid rgba(255, 0, 0, 0.329);
+}
+
+.filter:focus {
+	color: white;
+	background-color: #1D6154;
+}
