@@ -195,7 +195,7 @@ footer nav ul {
 	margin: 30px 0 50px 0;
 }
 
-.filter {
+.not-actived {
 	color: #1D6154;
 	background-color: white;
 	font-size: 16px;
@@ -204,12 +204,16 @@ footer nav ul {
 	padding: 6px 20px;
 }
 
-.filter:hover {
-    color: rgba(255, 0, 0, 0.329);
-	border: 1px solid rgba(255, 0, 0, 0.329);
+.not-actived:hover {
+    color: #B1663C;
+	border: 1px solid #B1663C;
 }
 
-.filter:focus {
+.actived {
 	color: white;
 	background-color: #1D6154;
+	font-size: 16px;
+	border: 1px solid #1D6154;
+	border-radius: 60px;
+	padding: 6px 20px;
 }
