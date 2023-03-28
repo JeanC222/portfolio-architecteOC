@@ -195,7 +195,7 @@ footer nav ul {
 	margin: 30px 0 50px 0;
 }
 
-.not-actived {
+.filter {
 	color: #1D6154;
 	background-color: white;
 	font-size: 16px;
@@ -204,7 +204,7 @@ footer nav ul {
 	padding: 6px 20px;
 }
 
-.not-actived:hover {
+.filter:hover {
     color: #B1663C;
 	border: 1px solid #B1663C;
 }

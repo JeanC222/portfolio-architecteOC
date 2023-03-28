@@ -6,7 +6,6 @@ const allFilters = document.querySelector(".all-filters");
 
 const gallery = document.querySelector(".gallery");
 
-
 /* Fonctions pour la partie filtres et gallery */
 
 // Fonction création travaux et insère dans la gallery  ( potentiellement séparer en plus petites )
@@ -22,6 +21,8 @@ function addWork(figure) {
   // création et stockage du contenu des nouveaux éléments
   newImage.src = figure.imageUrl
   newFigcaption = document.createTextNode(figure.title);
+  // data-id des figure
+  newFigure.dataset.id = figure.category.id
 
   // création de l'arborescance figure
   newFigure.appendChild(newImage)
@@ -37,17 +38,48 @@ function addFilter(filter) {
     // Création des noeuds
     const filterButton = document.createElement("button")
     
-    // injection de la class not-actived aux buttons
-    filterButton.classList.add("not-actived")
-
     // texte sous les images
     filterButton.innerText = filter.name
+    // data-id des buttons
+    filterButton.dataset.id = filter.id
                 
     // insère travaux dans la div filter
-    allFilters.appendChild(filterButton)   
-    console.log(filterButton);                       
+    allFilters.appendChild(filterButton) 
+    
+    // injection de la class not-actived aux buttons
+    filterButton.classList.add("filter")
+
+    // appel de la fonction filteractived  pour activer la class actived au click sur un button
+    filterActived(filterButton)
 }
- 
+
+// pointe sur le bouton "tous"
+const defaultButton = document.querySelector(".filter")
+
+// fonction activation des boutons
+function filterActived (actived) {
+  // ajout d'un évènement au click
+  actived.addEventListener("click", (e) => {
+
+    // pointe sur les bouttons filtre et stockage dans une variable 
+    let buttonsActived = document.querySelectorAll(".filter")
+
+    // distinction pour chaque filtre, suppression de la class actived au click
+    buttonsActived.forEach(btnActived => {
+    btnActived.classList.remove("actived")
+  });
+
+  // defaultButton.classList.add("actived")
+  // console.log(defaultButton);
+
+  // injection de la class actived sur le filtre cliqué
+  e.target.classList.add("actived");
+  
+
+  })
+}
+
+
 
 /* récupération des API pour l'ajout et le filtrage dynamique des travaux via fetch */
 
@@ -110,9 +142,10 @@ async function getFilters () {
 
     // Pour chacunes des figures des données du tableau récupérées, 
     jsonFilterList.forEach(jsonFilter => {
+
       // appel de la fonction addWork
       addFilter(jsonFilter)
-    });
+      });
   })
   // affichage du potentiel problème avec le fetch
   .catch((error) => {
@@ -121,3 +154,5 @@ async function getFilters () {
 }
 
 getFilters();
+
+
