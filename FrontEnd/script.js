@@ -21,8 +21,10 @@ function addWork(figure) {
   // création et stockage du contenu des nouveaux éléments
   newImage.src = figure.imageUrl
   newFigcaption = document.createTextNode(figure.title);
-  // data-id des figure
+
+  // data-id et id des figure
   newFigure.dataset.id = figure.category.id
+  newFigure.id = figure.id
 
   // création de l'arborescance figure
   newFigure.appendChild(newImage)
@@ -30,6 +32,8 @@ function addWork(figure) {
 
   // ajout de la figure dans le noeud gallery du DOM
   gallery.appendChild(newFigure)  
+  
+  
 }
 
 
@@ -41,7 +45,7 @@ function addFilter(filter) {
     // texte sous les images
     filterButton.innerText = filter.name
     // data-id des buttons
-    filterButton.dataset.id = filter.id
+    filterButton.id = filter.id
                 
     // insère travaux dans la div filter
     allFilters.appendChild(filterButton) 
@@ -74,11 +78,18 @@ function filterActived (actived) {
 
   // injection de la class actived sur le filtre cliqué
   e.target.classList.add("actived");
-  
+  // selectCategory(e.target)
 
   })
 }
 
+function selectCategory (filterActived) {
+
+  // if (filterActived.id == filterActived.category.id) {
+  //   filterActived.filter(filterActived.id != filterActived.category.id)
+  // }
+  
+}
 
 
 /* récupération des API pour l'ajout et le filtrage dynamique des travaux via fetch */
@@ -107,6 +118,9 @@ async function getWorks () {
 
       // Pour chacunes des figures des données du tableau récupérées, 
       jsonFigureList.forEach(jsonFigure => {
+
+        
+
         // appel de la fonction addWork 
         addWork(jsonFigure)
       });
