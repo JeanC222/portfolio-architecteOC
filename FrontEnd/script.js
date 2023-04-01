@@ -1,4 +1,3 @@
-
 /* Déclarations des variables utilisable sur tout le fichier */
 
 // constante pointe sur la div filtre et la gallery dans le DOM
@@ -6,96 +5,60 @@ const allFilters = document.querySelector(".all-filters");
 
 const gallery = document.querySelector(".gallery");
 
+
 /* Fonctions pour la partie filtres et gallery */
 
 // Fonction création travaux et insère dans la gallery  ( potentiellement séparer en plus petites )
-
-
 function addWork(figure) {
-
   // creation et stockage des nouveaux elements 
   let newFigure = document.createElement("figure")
   let newImage = document.createElement("img")
   let newFigcaption = document.createElement("figcaption")
   
-  // création et stockage du contenu des nouveaux éléments
+  // création du contenu des nouveaux éléments
+  newFigure.setAttribute("data-tag", figure.category.name)
+  newFigure.setAttribute("data-id", figure.id)
   newImage.src = figure.imageUrl
+  newImage.alt = figure.title
   newFigcaption = document.createTextNode(figure.title);
-
-  // data-id et id des figure
-  newFigure.dataset.id = figure.category.id
-  newFigure.id = figure.id
 
   // création de l'arborescance figure
   newFigure.appendChild(newImage)
   newFigure.appendChild(newFigcaption)
 
   // ajout de la figure dans le noeud gallery du DOM
-  gallery.appendChild(newFigure)  
-  
-  
+  gallery.appendChild(newFigure)   
 }
-
 
 // Fonction création button filtres et insère dans la div all-filters  ( potentiellement séparer en plus petites )
 function addFilter(filter) {
     // Création des noeuds
-    const filterButton = document.createElement("button")
-    
+    const filterButton = document.createElement("button")   
+    // data-tag id des buttons
+    filterButton.setAttribute("data-tag", filter.name);
+    filterButton.setAttribute("data-id", filter.id);
     // texte sous les images
     filterButton.innerText = filter.name
-    // data-id des buttons
-    filterButton.id = filter.id
-                
     // insère travaux dans la div filter
-    allFilters.appendChild(filterButton) 
-    
-    // injection de la class not-actived aux buttons
-    filterButton.classList.add("filter")
-
-    // appel de la fonction filteractived  pour activer la class actived au click sur un button
-    filterActived(filterButton)
+    allFilters.appendChild(filterButton)
+    // injection de la class filter aux buttons
+    filterButton.classList.add("filter") 
 }
 
-// pointe sur le bouton "tous"
-const defaultButton = document.querySelector(".filter")
-
-// fonction activation des boutons
-function filterActived (actived) {
-  // ajout d'un évènement au click
-  actived.addEventListener("click", (e) => {
-
-    // pointe sur les bouttons filtre et stockage dans une variable 
-    let buttonsActived = document.querySelectorAll(".filter")
-
-    // distinction pour chaque filtre, suppression de la class actived au click
-    buttonsActived.forEach(btnActived => {
-    btnActived.classList.remove("actived")
-  });
-
-  // defaultButton.classList.add("actived")
-  // console.log(defaultButton);
-
-  // injection de la class actived sur le filtre cliqué
-  e.target.classList.add("actived");
-  // selectCategory(e.target)
-
-  })
-}
-
-function selectCategory (filterActived) {
-
-  // if (filterActived.id == filterActived.category.id) {
-  //   filterActived.filter(filterActived.id != filterActived.category.id)
-  // }
-  
-}
+// function pour effacer tout élément enfants d'un parent
+function cleanChilds (parent) {
+  // Tant qu'il y a au moins un enfant
+  while (parent.childNodes.length > 0) {
+    // On efface le dernier élément, jusqu'à 0 enfants
+    parent.removeChild(parent.lastChild);
+  }
+};
 
 
 /* récupération des API pour l'ajout et le filtrage dynamique des travaux via fetch */
 
 // stockage de la récupération des travaux dans une fonction asynch
-async function getWorks () {
+async function getWorks (filterId) {
 
   // requête API travaux
   await fetch('http://localhost:5678/api/works')
@@ -116,13 +79,18 @@ async function getWorks () {
     // nouvelle requête et stock les données de response.json dans jsonFigureList 
     .then( jsonFigureList => {
 
+      cleanChilds(gallery)
       // Pour chacunes des figures des données du tableau récupérées, 
       jsonFigureList.forEach(jsonFigure => {
-
-        
-
-        // appel de la fonction addWork 
-        addWork(jsonFigure)
+        // appel de la fonction addWork en fonction des catégories.
+        // Tout est affiché si la catégorie n'est pas donnée 
+        if (filterId == jsonFigure.category.id || filterId == null) {
+          addWork(jsonFigure)
+        }
+        // si le filtre par défaut est renseigné, on affiche tous les works
+        if (filterId == 0) {
+          addWork(jsonFigure)
+        } 
       });
     })
     // affichage du potentiel problème avec le fetch
@@ -130,8 +98,6 @@ async function getWorks () {
       console.log("il y a eu un problème avec l'opération fetch : " + error.message);
     })
 }
-
-getWorks()
 
 // stockage de la récupération des catégories dans une fonction asynch
 async function getFilters () {
@@ -161,12 +127,39 @@ async function getFilters () {
       addFilter(jsonFilter)
       });
   })
+  .then ( () => {
+    // pointe sur les bouttons filtre et stockage dans une variable 
+    const buttons = document.querySelectorAll(".all-filters button");
+
+    // ajout d'un évènement au click pour chaque boutons
+    buttons.forEach((button) => {     
+
+      button.addEventListener("click", function () {  
+
+        let buttonTag = button.dataset.tag;
+        let filterId = button.getAttribute("data-id") 
+        // console.log(buttonTag);
+        // distinction pour chaque filtre, suppression de la class actived au click
+        buttons.forEach((button) => button.classList.remove("actived"));
+        // injection de la class actived sur le filtre cliqué
+        this.classList.add("actived"); 
+
+        console.log(filterId);
+        // récupération des travaux API en fonction des filtres par catégorie  
+        getWorks(filterId)
+      })
+    });
+  })  
   // affichage du potentiel problème avec le fetch
   .catch((error) => {
     console.log("il y a eu un problème avec l'opération fetch : " + error.message);
   })
 }
 
-getFilters();
+async function main() {
+  await getWorks();
+  await getFilters();
+};
 
+main();
 
