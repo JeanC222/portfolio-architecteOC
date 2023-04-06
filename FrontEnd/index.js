@@ -6,7 +6,7 @@ const allFilters = document.querySelector(".all-filters");
 const gallery = document.querySelector(".gallery");
 
 
-/* Fonctions pour la partie filtres et gallery */
+/* Fonctions réutilisable */
 
 // Fonction création travaux et insère dans la gallery  ( potentiellement séparer en plus petites )
 function addWork(figure) {
@@ -144,7 +144,6 @@ async function getFilters () {
         // injection de la class actived sur le filtre cliqué
         this.classList.add("actived"); 
 
-        console.log(filterId);
         // récupération des travaux API en fonction des filtres par catégorie  
         getWorks(filterId)
       })
