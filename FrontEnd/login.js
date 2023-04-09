@@ -1,7 +1,9 @@
 /* Déclarations des variables utilisable sur tout le fichier */
 
-// constante pointe sur les éléments du formulaire dans le DOM
 const loginForm = document.querySelector("form")
+
+const inputEmail = document.getElementById("email")
+const inputPassword = document.getElementById("password")
 
 /* Fonctions réutilisable */
 
@@ -26,8 +28,26 @@ const fetchHandler = async () => {
       body: JSON.stringify(data),
     });
 
-    const dataResponse = await response.JSON()
-    console.log(dataResponse);
+    // attente de la réponse au format json
+    const dataResponse = await response.json();
+
+    // si la réponse est bonne, redirection page admin et stockage token.
+    if (response.ok) {
+      localStorage.setItem(dataResponse.userId, dataResponse.token)
+      location.href = "./index.html"
+    } else {
+      inputEmail.classList.add("usernotfound");
+      inputPassword.classList.add("usernotfound");
+
+      const errorMessage = document.querySelector(".errormessage");
+      errorMessage.innerHTML = dataResponse.message;
+    }
+ 
+    // if (localStorage.getItem(dataResponse.userId)) {
+    //   location.href = "./index.html"
+
+
+
 
   } catch (error) {
     console.log(error);
@@ -37,6 +57,11 @@ const fetchHandler = async () => {
 };
 
 fetchHandler();
-  
 
 
+
+
+// if (headButtons.style.display === "none") {
+//   headButtons.style.display = "flex";
+//   console.log(headButtons);
+// }

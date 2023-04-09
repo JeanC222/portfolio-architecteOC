@@ -5,8 +5,46 @@ const allFilters = document.querySelector(".all-filters");
 
 const gallery = document.querySelector(".gallery");
 
+// constante pointe sur éléments visibles après submit du login
+const headButtons = document.querySelector(".head-buttons-container")
+
+const modifyElements = document.querySelectorAll(".modify")
+
+const login = document.getElementById("login")
 
 /* Fonctions réutilisable */
+
+// fonction gestinnaire des éléments admin
+function adminElementsHandler(adminElement) {
+  if (localStorage.getItem(1)) {
+    adminElement.style.display = "flex"
+  } else {
+    adminElement.style.display = "none"
+  }
+}
+
+adminElementsHandler(headButtons);
+
+modifyElements.forEach(modifyElement => {
+  adminElementsHandler(modifyElement)
+});
+
+if (localStorage.getItem(1)) {
+  login.innerText = "logout"
+} else {
+  login.innerText = "login"
+}
+
+if (localStorage.getItem(1)) {
+  allFilters.style.visibility = "hidden"
+  allFilters.style.marginTop = "0" + "px"
+} else {
+  allFilters.style.visibility = "visible"
+}
+
+login.addEventListener('click', () => {
+  localStorage.clear();
+})
 
 // Fonction création travaux et insère dans la gallery  ( potentiellement séparer en plus petites )
 function addWork(figure) {
