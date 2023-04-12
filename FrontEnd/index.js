@@ -12,39 +12,14 @@ const modifyElements = document.querySelectorAll(".modify")
 
 const login = document.getElementById("login")
 
+// constantes MODAL 
+const modalGallery = document.querySelector(".modal-gallery")
+
+const links = document.querySelectorAll(".js-modal")
+
+const buttonDeleteWork = document.querySelector(".delete-work-modal")
+console.log(buttonDeleteWork);
 /* Fonctions réutilisable */
-
-// fonction gestinnaire des éléments admin
-function adminElementsHandler(adminElement) {
-  if (localStorage.getItem(1)) {
-    adminElement.style.display = "flex"
-  } else {
-    adminElement.style.display = "none"
-  }
-}
-
-adminElementsHandler(headButtons);
-
-modifyElements.forEach(modifyElement => {
-  adminElementsHandler(modifyElement)
-});
-
-if (localStorage.getItem(1)) {
-  login.innerText = "logout"
-} else {
-  login.innerText = "login"
-}
-
-if (localStorage.getItem(1)) {
-  allFilters.style.visibility = "hidden"
-  allFilters.style.marginTop = "0" + "px"
-} else {
-  allFilters.style.visibility = "visible"
-}
-
-login.addEventListener('click', () => {
-  localStorage.clear();
-})
 
 // Fonction création travaux et insère dans la gallery  ( potentiellement séparer en plus petites )
 function addWork(figure) {
@@ -68,6 +43,41 @@ function addWork(figure) {
   gallery.appendChild(newFigure)   
 }
 
+
+
+function addWorkModal(modalfigure) {
+  // creation et stockage des nouveaux elements 
+  let newFigure = document.createElement("figure")
+  let newImage = document.createElement("img")
+  let newFigcaption = document.createElement("figcaption")
+  
+  // création du contenu des nouveaux éléments
+  newFigure.setAttribute("data-tag", modalfigure.category.name)
+  newFigure.setAttribute("data-id", modalfigure.id)
+  newImage.src = modalfigure.imageUrl
+  newImage.alt = modalfigure.title
+  newFigcaption = document.createTextNode("éditer");
+
+  // création de l'arborescance figure
+  newFigure.appendChild(newImage)
+  newFigure.appendChild(newFigcaption)
+
+  // ajout de la figure dans le noeud gallery du DOM
+  modalGallery.appendChild(newFigure)
+  
+    // ajout d'une class
+    addClass(newImage)
+
+    
+    addTrashIcon(newFigure)
+}
+
+function addTrashIcon (element) {
+
+  buttonDeleteWork.addEventListener("click", () => {
+    element.innerHTML += `<i class="fa-solid fa-trash-can"></i>`
+  })
+}
 // Fonction création button filtres et insère dans la div all-filters  ( potentiellement séparer en plus petites )
 function addFilter(filter) {
     // Création des noeuds
@@ -92,6 +102,20 @@ function cleanChilds (parent) {
   }
 };
 
+// fonction gestinnaire des éléments admin
+function adminElementsDisplay(adminElement) {
+  if (localStorage.getItem(1)) {
+    adminElement.style.display = "flex"
+  } else {
+    adminElement.style.display = "none"
+  }
+}
+
+// fonction ajout d'une class 
+
+function addClass(element) {
+  element.classList.add('modal-works')
+}
 
 /* récupération des API pour l'ajout et le filtrage dynamique des travaux via fetch */
 
@@ -128,7 +152,12 @@ async function getWorks (filterId) {
         // si le filtre par défaut est renseigné, on affiche tous les works
         if (filterId == 0) {
           addWork(jsonFigure)
-        } 
+        }
+
+        links.forEach(link => {
+          link.addEventListener("click", openModal)
+          addWorkModal(jsonFigure)
+        });
       });
     })
     // affichage du potentiel problème avec le fetch
@@ -193,10 +222,67 @@ async function getFilters () {
   })
 }
 
+async function adminElementsHandler() {
+  adminElementsDisplay(headButtons);
+
+  modifyElements.forEach(modifyElement => {
+  adminElementsDisplay(modifyElement)
+  });
+
+  if (localStorage.getItem(1)) {
+    login.innerText = "logout"
+    allFilters.style.visibility = "hidden"
+    allFilters.style.marginTop = "0" + "px"
+
+  } else {
+    login.innerText = "login"
+    allFilters.style.visibility = "visible"
+  }
+
+  login.addEventListener('click', () => {
+  localStorage.clear();
+  })
+}
+
 async function main() {
   await getWorks();
   await getFilters();
+  await adminElementsHandler();
 };
 
 main();
+
+
+
+let modal = null
+
+const openModal = function (e) {
+  e.preventDefault()
+  const target = document.querySelector(e.target.getAttribute('href'))
+  target.style.display = null
+  target.removeAttribute('aria-hidden')
+  target.setAttribute('aria-modal', 'true')
+  modal = target;
+  modal.addEventListener('click', closeModal)
+  modal.querySelector(".close-modal").addEventListener('click', closeModal)
+  modal.querySelector(".modal").addEventListener('click', stopPropagation)
+}
+
+const closeModal = function (e) {
+  if (modal === null) return
+  e.preventDefault()
+  modal.style.display = "none"
+  modal.setAttribute('aria-hidden', 'true')
+  modal.removeAttribute('aria-modal')
+  modal.removeEventListener('click', closeModal)
+  modal.querySelector(".close-modal").removeEventListener('click', closeModal)
+  modal.querySelector(".modal").removeEventListener('click', stopPropagation)
+  modal = null;
+}
+
+const stopPropagation = function (e) {
+  e.stopPropagation()
+}
+
+
 

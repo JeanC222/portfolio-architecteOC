@@ -7,6 +7,10 @@ const inputPassword = document.getElementById("password")
 
 /* Fonctions réutilisable */
 
+// fonction ajout de la class usernotfound
+function addUserNotFoundClass (element) {
+  element.classList.add("usernotfound")
+}
 
 // fonction gestionnaire du formulaire a la souscription de l'utilisateur 
 const fetchHandler = async () => {
@@ -36,18 +40,12 @@ const fetchHandler = async () => {
       localStorage.setItem(dataResponse.userId, dataResponse.token)
       location.href = "./index.html"
     } else {
-      inputEmail.classList.add("usernotfound");
-      inputPassword.classList.add("usernotfound");
+      addUserNotFoundClass (inputEmail)
+      addUserNotFoundClass (inputPassword)
 
       const errorMessage = document.querySelector(".errormessage");
-      errorMessage.innerHTML = dataResponse.message;
+      errorMessage.style.visibility = "visible";
     }
- 
-    // if (localStorage.getItem(dataResponse.userId)) {
-    //   location.href = "./index.html"
-
-
-
 
   } catch (error) {
     console.log(error);
@@ -57,11 +55,3 @@ const fetchHandler = async () => {
 };
 
 fetchHandler();
-
-
-
-
-// if (headButtons.style.display === "none") {
-//   headButtons.style.display = "flex";
-//   console.log(headButtons);
-// }
