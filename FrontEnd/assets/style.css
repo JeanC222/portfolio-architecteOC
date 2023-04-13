@@ -389,7 +389,7 @@ header nav li img {
 	font-size: 26px;
 	font-weight: 400;
 	color: black;
-	padding: 60px 0 50px 0;
+	padding: 50px 0 40px 0;
 }
 
 .modal-gallery {
@@ -399,8 +399,8 @@ header nav li img {
     grid-row-gap: 15px;
 	width: 65%;
 	margin: auto;
-	padding-bottom: 40px;
 	border-bottom: 1px solid #B3B3B3;
+	padding-bottom: 35px;
 }
 
 .buttons-container {
@@ -469,4 +469,82 @@ header nav li img {
 	cursor: pointer;
 	transition: 0.3s all ease;
 }
+
+/* modal partie ajout photo */
+
+.modal-addWork {
+	display: flex;
+	flex-direction: column;
+}
+
+.fa-arrow-left {
+	position: absolute;
+	top: 32px;
+	left: 35px;
+	font-size: 16px;
+}
+
+.fa-arrow-left:hover {
+	color: #D65353;
+}
+
+.modal-add-img {
+	display: flex;
+	flex-direction: column;
+	gap: 0px;
+}
+
+.add-img {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 169px;
+	background-color: #E8F1F6;
+}
+
+.fa-sharp.fa-regular.fa-image {
+	font-size: 40px;
+	color: #B9C5CC;
+}
+
+.modal button[type="submit"] {
+	font-family: 'Work Sans';
+	font-size: 14px;
+	border-radius: 50px;
+	width: 45%;
+	height: 36px;
+	background-color: #CBD6DC;
+	color: #306685;
+	border: none;
+	margin: 21px 0 7px 0;
+}
+
+.add-img p {
+	font-size: 10px;
+}
+
+.modal-addWork form {
+	display: flex;
+	flex-direction: column;
+}
+
+.select {
+	display: flex;
+    flex-direction: column;
+    padding-bottom: 47px;
+    border-bottom: 1px solid #B3B3B3;
+}
+
+#category {
+	height: 50px;
+    font-size: 1.2em;
+    border: none;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+
+
+
+
+
 

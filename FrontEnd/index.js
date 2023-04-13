@@ -18,7 +18,7 @@ const modalGallery = document.querySelector(".modal-gallery")
 const links = document.querySelectorAll(".js-modal")
 
 const buttonDeleteWork = document.querySelector(".delete-work-modal")
-console.log(buttonDeleteWork);
+
 /* Fonctions réutilisable */
 
 // Fonction création travaux et insère dans la gallery  ( potentiellement séparer en plus petites )
@@ -40,10 +40,9 @@ function addWork(figure) {
   newFigure.appendChild(newFigcaption)
 
   // ajout de la figure dans le noeud gallery du DOM
-  gallery.appendChild(newFigure)   
+  gallery.appendChild(newFigure)  
+  
 }
-
-
 
 function addWorkModal(modalfigure) {
   // creation et stockage des nouveaux elements 
@@ -63,13 +62,10 @@ function addWorkModal(modalfigure) {
   newFigure.appendChild(newFigcaption)
 
   // ajout de la figure dans le noeud gallery du DOM
-  modalGallery.appendChild(newFigure)
-  
-    // ajout d'une class
-    addClass(newImage)
-
-    
-    addTrashIcon(newFigure)
+  modalGallery.appendChild(newFigure) 
+  // ajout de fonctions
+  addClass(newImage)
+  addTrashIcon(newFigure)
 }
 
 function addTrashIcon (element) {
@@ -252,9 +248,25 @@ async function main() {
 
 main();
 
-
-
+const addImgButton = document.querySelector(".add-work-modal")
 let modal = null
+const modal2 = document.querySelector(".modal-addWork")
+const backFromModal2 = document.querySelector(".arrow-back")
+
+
+addImgButton.addEventListener('click', () => {
+  modal2.style.display = "flex"
+  modal.querySelector(".modal").style.display = "none"
+})
+
+backFromModal2.addEventListener('click', () => {
+  modal2.style.display = "none"
+  modal.querySelector(".modal").style.display = "grid"
+})
+
+
+
+
 
 const openModal = function (e) {
   e.preventDefault()
@@ -266,6 +278,10 @@ const openModal = function (e) {
   modal.addEventListener('click', closeModal)
   modal.querySelector(".close-modal").addEventListener('click', closeModal)
   modal.querySelector(".modal").addEventListener('click', stopPropagation)
+  
+  modal2.addEventListener('click', stopPropagation)
+  modal2.querySelector(".close-modal").addEventListener('click', closeModal)
+  
 }
 
 const closeModal = function (e) {
