@@ -15,9 +15,7 @@ const login = document.getElementById("login")
 // constantes MODAL 
 const modalGallery = document.querySelector(".modal-gallery")
 
-const links = document.querySelectorAll(".js-modal")
-
-const buttonDeleteWork = document.querySelector(".delete-work-modal")
+const link = document.querySelector(".js-modal")
 
 /* Fonctions réutilisable */
 
@@ -69,10 +67,7 @@ function addWorkModal(modalfigure) {
 }
 
 function addTrashIcon (element) {
-
-  buttonDeleteWork.addEventListener("click", () => {
-    element.innerHTML += `<i class="fa-solid fa-trash-can"></i>`
-  })
+    element.innerHTML += `<i class="fa-solid fa-trash-can trash-icon" style="z-index: 4;"></i>`
 }
 // Fonction création button filtres et insère dans la div all-filters  ( potentiellement séparer en plus petites )
 function addFilter(filter) {
@@ -100,7 +95,7 @@ function cleanChilds (parent) {
 
 // fonction gestinnaire des éléments admin
 function adminElementsDisplay(adminElement) {
-  if (localStorage.getItem(1)) {
+  if (localStorage.getItem("token")) {
     adminElement.style.display = "flex"
   } else {
     adminElement.style.display = "none"
@@ -144,16 +139,13 @@ async function getWorks (filterId) {
         // Tout est affiché si la catégorie n'est pas donnée 
         if (filterId == jsonFigure.category.id || filterId == null) {
           addWork(jsonFigure)
+          link.addEventListener("click", openModal)
+          addWorkModal(jsonFigure)
         }
         // si le filtre par défaut est renseigné, on affiche tous les works
         if (filterId == 0) {
           addWork(jsonFigure)
         }
-
-        links.forEach(link => {
-          link.addEventListener("click", openModal)
-          addWorkModal(jsonFigure)
-        });
       });
     })
     // affichage du potentiel problème avec le fetch
@@ -225,8 +217,9 @@ async function adminElementsHandler() {
   adminElementsDisplay(modifyElement)
   });
 
-  if (localStorage.getItem(1)) {
+  if (localStorage.getItem("token")) {
     login.innerText = "logout"
+    login.href = "./index.html"
     allFilters.style.visibility = "hidden"
     allFilters.style.marginTop = "0" + "px"
 
@@ -236,7 +229,7 @@ async function adminElementsHandler() {
   }
 
   login.addEventListener('click', () => {
-  localStorage.clear();
+    localStorage.clear();
   })
 }
 
@@ -263,9 +256,6 @@ backFromModal2.addEventListener('click', () => {
   modal2.style.display = "none"
   modal.querySelector(".modal").style.display = "grid"
 })
-
-
-
 
 
 const openModal = function (e) {
@@ -301,4 +291,40 @@ const stopPropagation = function (e) {
 }
 
 
+// const modale = document.querySelector('.modal')
+
+// modale.querySelector('modal-gallery figure').addEventListener("click", (e) => {
+//   console.log("ok");
+// })
+
+// document.querySelector('.modal').addEventListener('click', (e) => {
+//   console.log(e.target.parentNode.dataset);
+// })
+
+// const modalWorks = document.querySelector('.modal')
+
+// let img;
+// if (img !== null) {
+//   img = document.querySelector('.modal-works')
+//   console.log(img);
+// }
+
+
+// if (modal.style.display != "none") {
+//   const icons = document.querySelector('.trash-icon')
+//   icons.addEventListener('click', () => {
+//     console.log("cc");
+//   })
+
+// }
+
+
+
+// const deleteWork = async () => {
+//   fetch('http://localhost:5678/api/works/' + id, {
+//     method: 'DELETE',
+//   })
+//   .then(response => response.json())
+//   .then(data => console.log(data))
+// }
 

@@ -37,7 +37,7 @@ const fetchHandler = async () => {
 
     // si la réponse est bonne, redirection page admin et stockage token.
     if (response.ok) {
-      localStorage.setItem(dataResponse.userId, dataResponse.token)
+      localStorage.setItem("token", dataResponse.token)
       location.href = "./index.html"
     } else {
       addUserNotFoundClass (inputEmail)

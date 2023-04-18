@@ -70,13 +70,18 @@
 					<h1 class="modal-title">Ajout photo</h1>
 
 					<div class="modal-gallery modal-add-img">
+
+						<form action="#">
+
 						<div class="add-img">
 							<i class="fa-sharp fa-regular fa-image"></i>
-							<button type="submit">+ Ajouter photo</button>
+							<div class="parent-div">
+								<button class="btn-upload">+ Ajout photo</button>
+								<input type="file" name="upfile" />
+							</div>
 							<p>jpg, png : 4mo max</p>
 						</div>
 
-						<form action="#">
 							<label for="title">Titre</label>
 							<input type="text" name="title" id="title">
 
