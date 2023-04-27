@@ -17,6 +17,9 @@ const modalGallery = document.querySelector(".modal-gallery")
 
 const link = document.querySelector(".js-modal")
 
+// Récupération de l'élément input file
+const inputFile = document.getElementById('image');
+
 /* Fonctions réutilisable */
 
 // Fonction création travaux et insère dans la gallery  ( potentiellement séparer en plus petites )
@@ -66,9 +69,6 @@ function addWorkModal(modalfigure) {
   addTrashIcon(newFigure)
 }
 
-function addTrashIcon (element) {
-    element.innerHTML += `<i class="fa-solid fa-trash-can trash-icon" style="z-index: 4;"></i>`
-}
 // Fonction création button filtres et insère dans la div all-filters  ( potentiellement séparer en plus petites )
 function addFilter(filter) {
     // Création des noeuds
@@ -139,7 +139,7 @@ async function getWorks (filterId) {
         // Tout est affiché si la catégorie n'est pas donnée 
         if (filterId == jsonFigure.category.id || filterId == null) {
           addWork(jsonFigure)
-          link.addEventListener("click", openModal)
+          
           addWorkModal(jsonFigure)
         }
         // si le filtre par défaut est renseigné, on affiche tous les works
@@ -242,13 +242,66 @@ async function main() {
 main();
 
 const addImgButton = document.querySelector(".add-work-modal")
-let modal = null
+
 const modal2 = document.querySelector(".modal-addWork")
 const backFromModal2 = document.querySelector(".arrow-back")
 
 
+const postWork = async (element) => {
+
+  element.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Récupérer les valeurs des champs du formulaire
+  const title = document.getElementById('title').value;
+  const category = document.getElementById('category').value;
+  const file = inputFile.files[0]
+  console.log(file);
+
+  // Créer un objet FormData pour envoyer les données du formulaire
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('category', category);
+  formData.append('image', file);
+
+  // Encoder l'image en binaire
+  const reader = new FileReader();
+  reader.readAsBinaryString(file);
+
+  reader.onload = () => {
+    const binaryData = reader.result;
+
+    // Envoyer la requête AJAX
+    fetch('http://localhost:5678/api/works', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+        'Content-Type': 'multipart/form-data',
+        'accept': 'application/json'
+      },
+      body: JSON.stringify({
+        title,
+        category,
+        image: btoa(binaryData)
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+  };
+});
+}
+
+
 addImgButton.addEventListener('click', () => {
-  modal2.style.display = "flex"
+  if (modal2.style.display = "flex") {
+    const postWorkForm = document.getElementById('post-work')
+    postWork(postWorkForm);
+  }
   modal.querySelector(".modal").style.display = "none"
 })
 
@@ -257,6 +310,7 @@ backFromModal2.addEventListener('click', () => {
   modal.querySelector(".modal").style.display = "grid"
 })
 
+let modal = null
 
 const openModal = function (e) {
   e.preventDefault()
@@ -268,11 +322,11 @@ const openModal = function (e) {
   modal.addEventListener('click', closeModal)
   modal.querySelector(".close-modal").addEventListener('click', closeModal)
   modal.querySelector(".modal").addEventListener('click', stopPropagation)
-  
   modal2.addEventListener('click', stopPropagation)
   modal2.querySelector(".close-modal").addEventListener('click', closeModal)
-  
 }
+
+link.addEventListener("click", openModal)
 
 const closeModal = function (e) {
   if (modal === null) return
@@ -286,45 +340,105 @@ const closeModal = function (e) {
   modal = null;
 }
 
+
+
 const stopPropagation = function (e) {
   e.stopPropagation()
 }
 
+const deleteWork = async (element) => {
 
-// const modale = document.querySelector('.modal')
+  fetch('http://localhost:5678/api/works/' + element.getAttribute("data-id"), {
+    method: 'DELETE',
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('mauvaise réponse du réseau');
+      
+      } else {
+        element.remove()
+        getWorks()
+      }
+    })
+    .catch(error => console.error('il y a une erreur :', error));
+}
 
-// modale.querySelector('modal-gallery figure').addEventListener("click", (e) => {
-//   console.log("ok");
-// })
 
-// document.querySelector('.modal').addEventListener('click', (e) => {
-//   console.log(e.target.parentNode.dataset);
-// })
+function addTrashIcon (element) {
+  element.innerHTML += `<i class="fa-solid fa-trash-can trash-icon"></i>`
 
-// const modalWorks = document.querySelector('.modal')
+  const trashIcons = element.querySelector(".trash-icon")
 
-// let img;
-// if (img !== null) {
-//   img = document.querySelector('.modal-works')
-//   console.log(img);
-// }
+    trashIcons.addEventListener("click", (e) => {
+      if (confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+        deleteWork(element)
+      }
+    })
+
+}
+
+// Ajout d'un écouteur d'événement sur le changement de l'input file
+inputFile.addEventListener('change', () => {
+  // Récupération du fichier sélectionné
+  const file = inputFile.files[0];
+
+  // Vérification du type de fichier (image)
+  // if (file.type.startsWith('image/')) {
+
+    // Création d'un objet FileReader pour afficher la prévisualisation de l'image
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => {
+      // Création d'un élément img pour afficher la prévisualisation de l'image
+      const img = document.createElement('img');
+      // Ajout d'un écouteur d'événement sur le click de l'image
+      img.addEventListener('click', () => {
+      // Déclenchement de l'événement click de l'élément input file
+      inputFile.click();
+      });
+      img.src = reader.result;
+      img.style.maxWidth = '100px';
+      img.alt = 'Prévisualisation de l\'image';
+
+      // Ajout de l'élément img à la page
+      const preview = document.querySelector('.add-img');
+      preview.innerHTML = '';
+      preview.appendChild(img);
+    });
+
+    // Lecture du fichier en tant que URL data
+    reader.readAsDataURL(file);
+  // }
+});
+
+// Données à envoyer
 
 
-// if (modal.style.display != "none") {
-//   const icons = document.querySelector('.trash-icon')
-//   icons.addEventListener('click', () => {
-//     console.log("cc");
+// const formData = new FormData();
+// formData.append('title', 'Dupont');
+// formData.append('imageUrl', 'dupont@example.com');
+// formData.append('categoryId', 'Bonjour, comment allez-vous ?');
+
+// // Options de la requête
+// const options = {
+//   method: 'POST',
+//   body: formData
+// };
+
+// // Envoi de la requête
+// fetch('/url-du-serveur', options)
+//   .then(response => {
+//     if (!response.ok) {
+//       throw new Error('Erreur lors de la requête');
+//     }
+//     return response.json();
 //   })
-
-// }
-
-
-
-// const deleteWork = async () => {
-//   fetch('http://localhost:5678/api/works/' + id, {
-//     method: 'DELETE',
+//   .then(data => {
+//     console.log('Réponse du serveur :', data);
 //   })
-//   .then(response => response.json())
-//   .then(data => console.log(data))
-// }
-
+//   .catch(error => {
+//     console.error('Erreur :', error);
+//   });
