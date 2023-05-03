@@ -3,6 +3,7 @@
 const loginForm = document.querySelector("form")
 
 const inputEmail = document.getElementById("email")
+
 const inputPassword = document.getElementById("password")
 
 /* Fonctions réutilisable */
@@ -44,7 +45,7 @@ const fetchHandler = async () => {
       addUserNotFoundClass (inputPassword)
 
       const errorMessage = document.querySelector(".errormessage");
-      errorMessage.style.visibility = "visible";
+      errorMessage.style.display = "flex";
     }
 
   } catch (error) {

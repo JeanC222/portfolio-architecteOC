@@ -349,8 +349,8 @@ header nav li img {
 }
 
 .errormessage {
-	visibility: hidden;
-	padding: 5px;
+	display: none;
+	padding-top: 10px;
 	color: rgba(255, 0, 0, 0.521);
 }
 

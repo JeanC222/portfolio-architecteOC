@@ -17,8 +17,13 @@ const modalGallery = document.querySelector(".modal-gallery")
 
 const link = document.querySelector(".js-modal")
 
-// Récupération de l'élément input file
 const inputFile = document.getElementById('image');
+
+const addImgButton = document.querySelector(".add-work-modal")
+
+const modal2 = document.querySelector(".modal-addWork")
+
+const backFromModal2 = document.querySelector(".arrow-back")
 
 /* Fonctions réutilisable */
 
@@ -102,10 +107,44 @@ function adminElementsDisplay(adminElement) {
   }
 }
 
-// fonction ajout d'une class 
+async function adminElementsHandler() {
+  adminElementsDisplay(headButtons);
 
+  modifyElements.forEach(modifyElement => {
+  adminElementsDisplay(modifyElement)
+  });
+
+  if (localStorage.getItem("token")) {
+    login.innerText = "logout"
+    login.href = "./index.html"
+    allFilters.style.visibility = "hidden"
+    allFilters.style.marginTop = "0" + "px"
+
+  } else {
+    login.innerText = "login"
+    allFilters.style.visibility = "visible"
+  }
+
+  login.addEventListener('click', () => {
+    localStorage.clear();
+  })
+}
+
+// fonction ajout d'une class 
 function addClass(element) {
   element.classList.add('modal-works')
+}
+
+function addTrashIcon (element) {
+  element.innerHTML += `<i class="fa-solid fa-trash-can trash-icon"></i>`
+
+  const trashIcons = element.querySelector(".trash-icon")
+
+    trashIcons.addEventListener("click", (e) => {
+      if (confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+        deleteWork(element)
+      }
+    })
 }
 
 /* récupération des API pour l'ajout et le filtrage dynamique des travaux via fetch */
@@ -133,6 +172,8 @@ async function getWorks (filterId) {
     .then( jsonFigureList => {
 
       cleanChilds(gallery)
+      cleanChilds(modalGallery)
+
       // Pour chacunes des figures des données du tableau récupérées, 
       jsonFigureList.forEach(jsonFigure => {
         // appel de la fonction addWork en fonction des catégories.
@@ -210,43 +251,7 @@ async function getFilters () {
   })
 }
 
-async function adminElementsHandler() {
-  adminElementsDisplay(headButtons);
-
-  modifyElements.forEach(modifyElement => {
-  adminElementsDisplay(modifyElement)
-  });
-
-  if (localStorage.getItem("token")) {
-    login.innerText = "logout"
-    login.href = "./index.html"
-    allFilters.style.visibility = "hidden"
-    allFilters.style.marginTop = "0" + "px"
-
-  } else {
-    login.innerText = "login"
-    allFilters.style.visibility = "visible"
-  }
-
-  login.addEventListener('click', () => {
-    localStorage.clear();
-  })
-}
-
-async function main() {
-  await getWorks();
-  await getFilters();
-  await adminElementsHandler();
-};
-
-main();
-
-const addImgButton = document.querySelector(".add-work-modal")
-
-const modal2 = document.querySelector(".modal-addWork")
-const backFromModal2 = document.querySelector(".arrow-back")
-
-
+// Fonction fetch methode post pour poster des nouveaux travaux
 const postWork = async (element) => {
 
   element.addEventListener("submit", async (e) => {
@@ -276,18 +281,13 @@ const postWork = async (element) => {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
-        'Content-Type': 'multipart/form-data',
         'accept': 'application/json'
       },
-      body: JSON.stringify({
-        title,
-        category,
-        image: btoa(binaryData)
-      })
+      body: formData
     })
     .then(response => response.json())
     .then(data => {
-      console.log(data);
+      getWorks()
     })
     .catch(error => {
       console.error(error);
@@ -296,19 +296,35 @@ const postWork = async (element) => {
 });
 }
 
+// Fonction fetch methode delete pour supprimer des travaux
+const deleteWork = async (element) => {
 
-addImgButton.addEventListener('click', () => {
-  if (modal2.style.display = "flex") {
-    const postWorkForm = document.getElementById('post-work')
-    postWork(postWorkForm);
-  }
-  modal.querySelector(".modal").style.display = "none"
-})
+  fetch('http://localhost:5678/api/works/' + element.getAttribute("data-id"), {
+    method: 'DELETE',
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('mauvaise réponse du réseau');
+      
+      } else {
+        element.remove()
+        getWorks()
+      }
+    })
+    .catch(error => console.error('il y a une erreur :', error));
+}
 
-backFromModal2.addEventListener('click', () => {
-  modal2.style.display = "none"
-  modal.querySelector(".modal").style.display = "grid"
-})
+
+async function main() {
+  await getWorks();
+  await getFilters();
+  await adminElementsHandler();
+};
+
+main();
 
 let modal = null
 
@@ -340,53 +356,14 @@ const closeModal = function (e) {
   modal = null;
 }
 
-
-
 const stopPropagation = function (e) {
   e.stopPropagation()
 }
 
-const deleteWork = async (element) => {
-
-  fetch('http://localhost:5678/api/works/' + element.getAttribute("data-id"), {
-    method: 'DELETE',
-    headers: {
-      'Authorization': 'Bearer ' + localStorage.getItem('token')
-    }
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('mauvaise réponse du réseau');
-      
-      } else {
-        element.remove()
-        getWorks()
-      }
-    })
-    .catch(error => console.error('il y a une erreur :', error));
-}
-
-
-function addTrashIcon (element) {
-  element.innerHTML += `<i class="fa-solid fa-trash-can trash-icon"></i>`
-
-  const trashIcons = element.querySelector(".trash-icon")
-
-    trashIcons.addEventListener("click", (e) => {
-      if (confirm("Voulez-vous vraiment supprimer cet élément ?")) {
-        deleteWork(element)
-      }
-    })
-
-}
-
-// Ajout d'un écouteur d'événement sur le changement de l'input file
+// Ajout d'un événement sur l'input file pour afficher la prévisualisation de l'image
 inputFile.addEventListener('change', () => {
   // Récupération du fichier sélectionné
   const file = inputFile.files[0];
-
-  // Vérification du type de fichier (image)
-  // if (file.type.startsWith('image/')) {
 
     // Création d'un objet FileReader pour afficher la prévisualisation de l'image
     const reader = new FileReader();
@@ -400,7 +377,7 @@ inputFile.addEventListener('change', () => {
       inputFile.click();
       });
       img.src = reader.result;
-      img.style.maxWidth = '100px';
+      img.style.maxWidth = '125px';
       img.alt = 'Prévisualisation de l\'image';
 
       // Ajout de l'élément img à la page
@@ -411,34 +388,17 @@ inputFile.addEventListener('change', () => {
 
     // Lecture du fichier en tant que URL data
     reader.readAsDataURL(file);
-  // }
 });
 
-// Données à envoyer
+addImgButton.addEventListener('click', () => {
+  if (modal2.style.display = "flex") {
+    const postWorkForm = document.getElementById('post-work')
+    postWork(postWorkForm);
+  }
+  modal.querySelector(".modal").style.display = "none"
+})
 
-
-// const formData = new FormData();
-// formData.append('title', 'Dupont');
-// formData.append('imageUrl', 'dupont@example.com');
-// formData.append('categoryId', 'Bonjour, comment allez-vous ?');
-
-// // Options de la requête
-// const options = {
-//   method: 'POST',
-//   body: formData
-// };
-
-// // Envoi de la requête
-// fetch('/url-du-serveur', options)
-//   .then(response => {
-//     if (!response.ok) {
-//       throw new Error('Erreur lors de la requête');
-//     }
-//     return response.json();
-//   })
-//   .then(data => {
-//     console.log('Réponse du serveur :', data);
-//   })
-//   .catch(error => {
-//     console.error('Erreur :', error);
-//   });
+backFromModal2.addEventListener('click', () => {
+  modal2.style.display = "none"
+  modal.querySelector(".modal").style.display = "grid"
+})
