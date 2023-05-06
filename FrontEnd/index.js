@@ -150,10 +150,10 @@ function addTrashIcon (element) {
 /* récupération des API pour l'ajout et le filtrage dynamique des travaux via fetch */
 
 // stockage de la récupération des travaux dans une fonction asynch
-async function getWorks (filterId) {
+function getWorks (filterId) {
 
   // requête API travaux
-  await fetch('http://localhost:5678/api/works')
+  fetch('http://localhost:5678/api/works')
 
     // récupération des données dans "response"
     .then((response) => {
@@ -196,10 +196,10 @@ async function getWorks (filterId) {
 }
 
 // stockage de la récupération des catégories dans une fonction asynch
-async function getFilters () {
+function getFilters () {
   
   // requête API catégories
-  await fetch('http://localhost:5678/api/categories')
+  fetch('http://localhost:5678/api/categories')
 
   // récupération des données dans "response"
   .then((response) => {
@@ -223,7 +223,7 @@ async function getFilters () {
       addFilter(jsonFilter)
       });
   })
-  .then ( () => {
+  .then (() => {
     // pointe sur les bouttons filtre et stockage dans une variable 
     const buttons = document.querySelectorAll(".all-filters button");
 
@@ -234,7 +234,7 @@ async function getFilters () {
 
         let buttonTag = button.dataset.tag;
         let filterId = button.getAttribute("data-id") 
-        // console.log(buttonTag);
+
         // distinction pour chaque filtre, suppression de la class actived au click
         buttons.forEach((button) => button.classList.remove("actived"));
         // injection de la class actived sur le filtre cliqué
@@ -252,16 +252,38 @@ async function getFilters () {
 }
 
 // Fonction fetch methode post pour poster des nouveaux travaux
-const postWork = async (element) => {
+const postWork = (element) => {
 
-  element.addEventListener("submit", async (e) => {
+  element.addEventListener("submit", (e) => {
     e.preventDefault();
+
+    const inputs = element.querySelectorAll("input, select");
+    let emptyFields = [];
+
+    for (let i = 0; i < inputs.length; i++) {
+      if (inputs[i].value.trim() === "") {
+        emptyFields.push(inputs[i]);
+      }
+    }
+
+    if (emptyFields.length > 0) {
+      for (let i = 0; i < emptyFields.length; i++) {
+        let errorMessage = emptyFields[i].nextSibling;
+
+        if (!errorMessage || errorMessage.className !== "error-message") {
+          errorMessage = document.createElement("div");
+          errorMessage.innerHTML = "Ce champ est obligatoire";
+          errorMessage.className = "error-message";
+          emptyFields[i].parentNode.insertBefore(errorMessage, emptyFields[i].nextSibling);
+        }
+      }
+      return;
+    }
 
     // Récupérer les valeurs des champs du formulaire
   const title = document.getElementById('title').value;
   const category = document.getElementById('category').value;
   const file = inputFile.files[0]
-  console.log(file);
 
   // Créer un objet FormData pour envoyer les données du formulaire
   const formData = new FormData();
@@ -319,8 +341,8 @@ const deleteWork = async (element) => {
 
 
 async function main() {
-  await getWorks();
-  await getFilters();
+  getWorks();
+  getFilters();
   await adminElementsHandler();
 };
 
