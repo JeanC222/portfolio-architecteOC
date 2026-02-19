@@ -1,58 +1,59 @@
 /* Déclarations des variables utilisable sur tout le fichier */
 
-const loginForm = document.querySelector("form")
+const loginForm = document.querySelector("form");
 
-const inputEmail = document.getElementById("email")
+const inputEmail = document.getElementById("email");
 
-const inputPassword = document.getElementById("password")
+const inputPassword = document.getElementById("password");
 
+const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5678"
+    : "https://portfolio-architecteoc.onrender.com";
 /* Fonctions réutilisable */
 
 // fonction ajout de la class usernotfound
-function addUserNotFoundClass (element) {
-  element.classList.add("usernotfound")
+function addUserNotFoundClass(element) {
+  element.classList.add("usernotfound");
 }
 
-// fonction gestionnaire du formulaire a la souscription de l'utilisateur 
+// fonction gestionnaire du formulaire a la souscription de l'utilisateur
 const fetchHandler = async () => {
-
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
+
     // recupération des données des inputs du formulaire
-    const formData = new FormData(loginForm)
-    const data = Object.fromEntries(formData)
-  
-  // fetch POST
-  try {
-    const response = await fetch("http://localhost:5678/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    const formData = new FormData(loginForm);
+    const data = Object.fromEntries(formData);
 
-    // attente de la réponse au format json
-    const dataResponse = await response.json();
+    // fetch POST
+    try {
+      const response = await fetch(`${API_URL}/api/users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    // si la réponse est bonne, redirection page admin et stockage token.
-    if (response.ok) {
-      localStorage.setItem("token", dataResponse.token)
-      location.href = "./index.html"
-    } else {
-      addUserNotFoundClass (inputEmail)
-      addUserNotFoundClass (inputPassword)
+      // attente de la réponse au format json
+      const dataResponse = await response.json();
 
-      const errorMessage = document.querySelector(".errormessage");
-      errorMessage.style.display = "flex";
+      // si la réponse est bonne, redirection page admin et stockage token.
+      if (response.ok) {
+        localStorage.setItem("token", dataResponse.token);
+        location.href = "./index.html";
+      } else {
+        addUserNotFoundClass(inputEmail);
+        addUserNotFoundClass(inputPassword);
+
+        const errorMessage = document.querySelector(".errormessage");
+        errorMessage.style.display = "flex";
+      }
+    } catch (error) {
+      console.log(error);
     }
-
-  } catch (error) {
-    console.log(error);
-  }
-
-  })
+  });
 };
 
 fetchHandler();
