@@ -13,6 +13,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "img-src": [
+          "'self'",
+          "data:",
+          "https://portfolio-architecteoc.onrender.com",
+        ],
+        "connect-src": [
+          "'self'",
+          "https://portfolio-architecteoc.onrender.com",
+        ],
+      },
+    },
   }),
 );
 app.use("/images", express.static(path.join(__dirname, "images")));
